@@ -30,6 +30,8 @@ tested on large swarms.
   `mure/<slug>/<member>`.
 - `docs/`: design rationale (FR), normative protocol (EN), harness adapters (EN), four worked
   examples with real board transcripts.
+- `site/`: French landing page on GitHub Pages (`t12lve.github.io/mure`), terminal theme, built
+  from the same text as `README.fr.md` and checked with Lighthouse (100 accessibility).
 - `install.ps1` (Windows junction) and `install.sh` (symlink), CI on Linux/macOS/Windows, Node 18–22.
 
 ### Fixed after the first review

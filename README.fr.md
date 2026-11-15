@@ -8,7 +8,7 @@ Mure est l'idée du `/swarm` de Google Antigravity, transposée aux harnais dont
 dormir sur un tableau — OpenCode, Claude Code, Codex CLI, Gemini CLI, Cursor. C'est un **skill**
 (`SKILL.md`) et un **CLI sans dépendance** (`scripts/mure.mjs`).
 
-*[English](README.md)*
+*[English](README.md)* · [Site en français](https://t12lve.github.io/mure/)
 
 > Le tableau est la seule vérité, la mention est le seul réveil, et le coordinateur ne fait pas le
 > travail technique.
@@ -108,8 +108,9 @@ docs/
 scripts/mure.mjs       le CLI, zéro dépendance, Node 18+
 test/mure.test.mjs     node --test, 23 tests
 references/prompts.md  gabarits de prompts à copier
+site/                  la page française (GitHub Pages)
 install.ps1 / install.sh
-.github/workflows/     CI : Linux, macOS, Windows ; Node 18 à 22
+.github/workflows/     CI : Linux, macOS, Windows ; Node 18 à 22 ; Pages
 ```
 
 L'état vit dans `.mure/<slug>/` à la racine du projet : `board.jsonl` (append-only), `members.json`,

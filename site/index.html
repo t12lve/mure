@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mure — un essaim d'agents de code sur un seul tableau noir</title>
+<meta name="description" content="Mure est un skill et un CLI sans dépendance pour faire travailler plusieurs agents de code en parallèle : un coordinateur découpe, des workers nommés construisent, un vérificateur indépendant juge. Rien n'est fait avant son verdict.">
+<meta name="author" content="t12lve">
+<meta name="color-scheme" content="dark">
+<link rel="canonical" href="https://t12lve.github.io/mure/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Mure — un essaim d'agents de code sur un seul tableau noir">
+<meta property="og:description" content="Un coordinateur découpe, des workers nommés construisent en parallèle, un vérificateur indépendant lance les tests et juge. Rien n'est fait avant que ce juge ait parlé.">
+<meta property="og:url" content="https://t12lve.github.io/mure/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- th3 b0ard 1s th3 0nly truth -->
+<a class="skip" href="#contenu">Aller au contenu</a>
+<div class="crt" aria-hidden="true"></div>
+
+<div class="statusbar">
+  <div class="wrap statusbar-inner">
+    <span class="sb-left"><b>root@mure</b>:<span class="sb-path">~</span>$ mure --status</span>
+    <span class="sb-right">
+      <span class="sb-live"><i aria-hidden="true"></i>ONLINE</span>
+      <span class="sb-sep" aria-hidden="true">|</span>
+      <span>node &gt;= 18</span>
+      <span class="sb-sep" aria-hidden="true">|</span>
+      <span>MIT</span>
+    </span>
+  </div>
+</div>
+
+<header class="site-head">
+  <div class="wrap head-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark" aria-hidden="true">群れ</span>
+      <span class="brand-name">mure<span class="brand-cursor" aria-hidden="true">_</span></span>
+    </a>
+    <nav class="site-nav" aria-label="Navigation principale">
+      <a href="#principe">principe</a>
+      <a href="#boucle">boucle</a>
+      <a href="#installer">installer</a>
+      <a href="#commandes">commandes</a>
+      <a href="#portes">portes</a>
+      <a href="#limites">limites</a>
+      <a class="nav-ext" href="https://github.com/t12lve/mure">github&nbsp;↗</a>
+      <a class="nav-lang" href="https://github.com/t12lve/mure/blob/main/README.md" hreflang="en" lang="en">[EN]</a>
+    </nav>
+  </div>
+</header>
+
+<main id="contenu">
+
+  <section class="hero" id="top">
+    <canvas id="rain" aria-hidden="true"></canvas>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="kicker"><span class="kicker-prompt" aria-hidden="true">&gt;</span> skill + cli · zéro dépendance · node 18+</p>
+        <h1>Un essaim d'agents de code sur un seul tableau noir.<span class="h1-cursor" aria-hidden="true">█</span></h1>
+        <p class="lead">
+          Un coordinateur découpe. Des workers nommés construisent en parallèle. Un vérificateur
+          indépendant lance les tests et juge. <strong>Rien n'est considéré comme fait avant que ce juge
+          ait parlé.</strong>
+        </p>
+        <p class="hero-note">
+          Mure est l'idée du <code>/swarm</code> de Google Antigravity, transposée aux harnais dont les
+          agents ne savent pas dormir sur un tableau — OpenCode, Claude Code, Codex CLI, Gemini CLI,
+          Cursor.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#installer">$ installer</a>
+          <a class="btn btn-ghost" href="https://github.com/t12lve/mure/blob/main/SKILL.md">lire la méthode</a>
+        </div>
+      </div>
+
+      <figure class="board" aria-labelledby="board-caption">
+        <div class="board-bar" aria-hidden="true">
+          <span class="bb-dot"></span><span class="bb-dot"></span><span class="bb-dot"></span>
+          <em>~/projet/.mure/validation/board.jsonl</em>
+        </div>
+        <pre class="board-body"><code><span class="c-prompt">$</span> mure status
+swarm   validation
+goal    Add input validation to parser and api handlers
+verify  npm test
+board   8 post(s)   max-parallel 2
+
+<span class="c-head">MEMBER            ROLE        STATE                              LAST</span>
+@coordinator      coordinator you (2 unread)                     <span class="c-num">#4</span> note
+@parser           worker      waiting (last verdict: validated)   <span class="c-num">#2</span> report
+@api              worker      runnable (2 unread)                 <span class="c-num">#7</span> report
+@verifier         verifier    waiting                             <span class="c-num">#8</span> verdict</code></pre>
+        <figcaption id="board-caption">
+          Chaque post est numéroté, daté, adressé. Un membre sans post non lu ne tourne pas : il ne
+          coûte rien, puisqu'on ne le lance pas.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="band" id="principe" aria-labelledby="principe-t">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="sec-num" aria-hidden="true">[01]</p>
+        <h2 id="principe-t">Trois règles, et rien d'autre</h2>
+        <p class="sec-sub">
+          C'est toute l'astuce : pas de polling, pas de processus endormi. Antigravity peut parquer un
+          agent en veille sur un tableau ; ici, « endormi » veut dire « aucun processus ».
+        </p>
+      </div>
+
+      <ol class="rules">
+        <li>
+          <span class="rule-n" aria-hidden="true">01</span>
+          <h3>Le tableau est la seule vérité</h3>
+          <p>
+            Chaque consigne, question, rapport et verdict est un post numéroté, horodaté, adressé, dans
+            un journal <em>append-only</em>. Ce qui n'est pas sur le tableau n'a pas eu lieu.
+          </p>
+        </li>
+        <li>
+          <span class="rule-n" aria-hidden="true">02</span>
+          <h3>La mention est le seul réveil</h3>
+          <p>
+            Un membre n'agit que s'il a un post non lu qui lui est adressé. Sans post, il ne tourne pas —
+            et ne coûte rien. On ne simule jamais un agent endormi avec une boucle d'attente.
+          </p>
+        </li>
+        <li>
+          <span class="rule-n" aria-hidden="true">03</span>
+          <h3>Le coordinateur ne code pas</h3>
+          <p>
+            Il découpe, route, répond aux questions et tranche la clôture. S'il implémente lui-même la
+            pièce la plus facile, ce n'est plus un essaim : c'est un agent seul avec du décor.
+          </p>
+        </li>
+      </ol>
+
+      <div class="fit">
+        <h3 class="fit-t"><span aria-hidden="true">&gt;</span> quand l'utiliser — et quand s'abstenir</h3>
+        <dl class="fit-list">
+          <div><dt>Une tâche annexe pendant que vous travaillez</dt><dd>un seul sous-agent</dd></div>
+          <div><dt>Un problème dur et fortement couplé (un bug, un algorithme)</dt><dd>un agent, ou des relances ciblées</dd></div>
+          <div class="is-mure"><dt>Un travail large qui se découpe en morceaux disjoints</dt><dd>mure</dd></div>
+          <div><dt>Un chantier de plusieurs jours avec jalons</dt><dd>un plan, puis des runs Mure successifs</dd></div>
+        </dl>
+        <p class="fit-no">
+          <span class="tag-no">refusé</span>
+          Un changement sur un seul fichier, une question à laquelle vous pouvez répondre seul, un
+          travail où chaque morceau touche le même fichier, ou tout ce pour quoi vous ne savez pas
+          énoncer une commande de vérification.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-alt" id="boucle" aria-labelledby="boucle-t">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="sec-num" aria-hidden="true">[02]</p>
+        <h2 id="boucle-t">La boucle en sept étapes</h2>
+        <p class="sec-sub">
+          Dans l'ordre. On ne saute ni la première ni la sixième. Chaque commande écrit son état dans le
+          <code>.mure/</code> du dépôt courant : lancez-la depuis le projet sur lequel vous travaillez.
+        </p>
+      </div>
+
+      <ol class="steps">
+        <li>
+          <div class="step-h"><span aria-hidden="true">01</span><h3>Énoncer l'objectif et la vérification</h3></div>
+          <p>
+            Une phrase, et la commande qui prouve le travail (<code>npm test</code>,
+            <code>pytest -q</code>, <code>go test ./...</code>, <code>tsc --noEmit</code>). Un essaim
+            sans commande de vérification produit de la prose confiante, pas du code qui marche.
+          </p>
+        </li>
+        <li>
+          <div class="step-h"><span aria-hidden="true">02</span><h3>Créer l'essaim</h3></div>
+          <p>
+            <code>--verify</code> est recopiée dans le prompt de chaque membre : personne n'a à deviner
+            ce que « fait » veut dire. <code>--max-parallel</code> est un frein de quota, pas une limite
+            technique.
+          </p>
+        </li>
+        <li>
+          <div class="step-h"><span aria-hidden="true">03</span><h3>Découper en morceaux qui ne se chevauchent pas</h3></div>
+          <p>
+            Une pièce par fichier, par paquet, par module, par question. On nomme le membre d'après sa
+            pièce : <code>@parser</code>, <code>@api-tests</code>, <code>@docs</code>. <code>--owns</code>
+            est réellement appliqué : <code>mure scope</code> sort en erreur sur une violation.
+          </p>
+        </li>
+        <li>
+          <div class="step-h"><span aria-hidden="true">04</span><h3>Poster le brief, puis dispatcher</h3></div>
+          <p>
+            <code>mure prompt @x</code> rend le brief plus tous les posts non lus, et avance le curseur :
+            le texte que vous collez <em>est</em> la livraison. On ne le reformule pas, on ne le résume
+            pas, on ne le colle pas dans deux agents.
+          </p>
+        </li>
+        <li>
+          <div class="step-h"><span aria-hidden="true">05</span><h3>Collecter et router</h3></div>
+          <p>
+            Chaque tour se termine par un post unique : <code>report</code>, ou <code>question</code> si
+            le membre est bloqué. Ensuite, le processus s'arrête. On réveille le vérificateur par une
+            <code>note</code>, jamais par un <code>brief</code>.
+          </p>
+        </li>
+        <li>
+          <div class="step-h"><span aria-hidden="true">06</span><h3>Vérifier avant de croire</h3></div>
+          <p>
+            Le vérificateur lit les diffs, lance la vraie commande et poste un verdict par worker. Un
+            rejet n'est pas une semonce, c'est un élément de travail : on re-dispatche le même worker.
+          </p>
+        </li>
+        <li>
+          <div class="step-h"><span aria-hidden="true">07</span><h3>Clore et rapporter</h3></div>
+          <p>
+            <code>close</code> refuse tant qu'une porte est ouverte. Puis on rapporte : ce qui a été
+            vérifié et par quelle commande, ce qui ne l'a pas été, les contradictions, où sont les
+            fichiers, et ce que veut dire une réserve.
+          </p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="band" id="installer" aria-labelledby="installer-t">
+    <div class="wrap two-col">
+      <div>
+        <div class="sec-head">
+          <p class="sec-num" aria-hidden="true">[03]</p>
+          <h2 id="installer-t">Le dépôt <em>est</em> le skill</h2>
+        </div>
+        <p class="body-p">
+          Le dossier doit être visible sous le nom <code>mure</code>, avec <code>SKILL.md</code> à sa
+          racine. Le script crée une jonction (Windows) ou un lien symbolique vers
+          <code>~/.config/opencode/skills/mure</code>, <code>~/.claude/skills/mure</code> et
+          <code>~/.agents/skills/mure</code> : un <code>git pull</code> met tous les harnais à jour d'un
+          coup. Supprimez ceux que vous n'utilisez pas.
+        </p>
+        <p class="body-p small">
+          Prérequis : Node 18+ (<code>node scripts/mure.mjs help</code> doit afficher la liste des
+          commandes). Git est optionnel, sauf pour <code>mure scope</code>, <code>mure worktree</code> et
+          la baseline de dispatch.
+        </p>
+      </div>
+
+      <div class="codes">
+        <div class="code-card">
+          <p class="code-title"><span aria-hidden="true">$</span> installer</p>
+          <pre><code>git clone https://github.com/t12lve/mure.git
+cd mure
+
+<span class="c-comment"># macOS / Linux</span>
+./install.sh
+
+<span class="c-comment"># Windows</span>
+.\install.ps1</code></pre>
+        </div>
+        <div class="code-card">
+          <p class="code-title"><span aria-hidden="true">$</span> cinq minutes</p>
+          <pre><code>cd mon-projet
+M="node /chemin/vers/mure/scripts/mure.mjs"
+
+<span class="c-comment"># 1. l'essaim, et la preuve du travail</span>
+$M init validation --goal "Add input validation" \
+  --verify "npm test" --max-parallel 2 --worktrees
+
+<span class="c-comment"># 2. un membre par morceau étanche</span>
+$M member add "@parser" --role worker \
+  --owns "src/parser.js,test/parser.test.js" \
+  --must-not "src/api.js" --done "parse() throws"
+
+$M member add "@verifier" --role verifier \
+  --watches "@parser" --done "suite run, diffs read"
+
+<span class="c-comment"># 3. le brief va aux workers, pas au vérificateur</span>
+$M post --from "@coordinator" --to "@parser" \
+  --kind brief --body "One file pair. Report when green."
+
+<span class="c-comment"># 4. qui a du travail ?</span>
+$M runnable
+$M prompt "@parser"   <span class="c-comment"># à donner tel quel</span></code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-alt" id="commandes" aria-labelledby="commandes-t">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="sec-num" aria-hidden="true">[04]</p>
+        <h2 id="commandes-t">Les cinq commandes qui comptent</h2>
+        <p class="sec-sub">
+          <code>mure</code> est le raccourci de <code>node &lt;chemin&gt;/scripts/mure.mjs</code>. Un
+          alias de shell est commode, jamais obligatoire.
+        </p>
+      </div>
+
+      <div class="cmd-table" role="table" aria-label="Les cinq commandes principales">
+        <div class="cmd-row cmd-head" role="row">
+          <span role="columnheader">commande</span>
+          <span role="columnheader">la question à laquelle elle répond</span>
+        </div>
+        <div class="cmd-row" role="row"><code role="cell">mure runnable</code><span role="cell">qui a du travail maintenant ?</span></div>
+        <div class="cmd-row" role="row"><code role="cell">mure prompt @x</code><span role="cell">que faut-il donner à <code>@x</code> pour son tour ?</span></div>
+        <div class="cmd-row" role="row"><code role="cell">mure inbox @x</code><span role="cell">qu'a lu <code>@x</code>, et qu'est-ce qui reste ?</span></div>
+        <div class="cmd-row" role="row"><code role="cell">mure status</code><span role="cell">où en est l'essaim ?</span></div>
+        <div class="cmd-row" role="row"><code role="cell">mure close</code><span role="cell">peut-on considérer que c'est fini ?</span></div>
+      </div>
+
+      <div class="verdict-table">
+        <p class="vt-title"><span aria-hidden="true">&gt;</span> les quatre verdicts</p>
+        <div class="vt-row vt-head"><span>verdict</span><span>signification</span><span>effet</span></div>
+        <div class="vt-row"><code>validated</code><span>vérifié, conforme au brief</span><span>fait</span></div>
+        <div class="vt-row"><span><code>validated-with-reserve</code></span><span>vérifié, avec une lacune nommée</span><span>fait ; la réserve se cite mot pour mot</span></div>
+        <div class="vt-row vt-bad"><code>rejected</code><span>ne répond pas au brief</span><span>le worker est re-dispatche</span></div>
+        <div class="vt-row"><code>needs-info</code><span>impossible à juger en l'état</span><span>le coordinateur poste le fait manquant</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="portes" aria-labelledby="portes-t">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="sec-num" aria-hidden="true">[05]</p>
+        <h2 id="portes-t">Trois portes qui refusent</h2>
+        <p class="sec-sub">
+          L'outil dit non à votre place. C'est là qu'il gagne son coût : la discipline n'est pas dans la
+          doc, elle est dans le code, avec les codes de sortie qui vont avec.
+        </p>
+      </div>
+
+      <div class="gates">
+        <article>
+          <h3>Porte de vérification</h3>
+          <p>
+            Un verdict doit citer un rapport, porter un motif obligatoire, et une réserve doit être
+            citable. <code>verdict</code> refuse un non-vérificateur, et un worker ne peut pas poster de
+            verdict.
+          </p>
+          <p class="gate-code">exit 1</p>
+        </article>
+        <article>
+          <h3>Porte de clôture</h3>
+          <p>
+            <code>close</code> refuse sur une question ouverte, un worker qui n'a jamais rapporté, un
+            rapport jamais jugé alors qu'un vérificateur existe, un verdict <code>rejected</code> ou
+            <code>needs-info</code>, ou un <code>block</code> non résolu.
+          </p>
+          <p class="gate-code">exit 1</p>
+        </article>
+        <article>
+          <h3>Porte de périmètre</h3>
+          <p>
+            Chaque dispatch enregistre une baseline de l'arbre. <code>scope</code> ne rend que ce qui a
+            changé depuis, et sort en erreur si un fichier hors <code>--owns</code> a bougé : un fichier
+            déjà sale avant le tour n'est pas imputé au worker.
+          </p>
+          <p class="gate-code">exit 3</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-alt" id="limites" aria-labelledby="limites-t">
+    <div class="wrap two-col tight">
+      <div>
+        <div class="sec-head">
+          <p class="sec-num" aria-hidden="true">[06]</p>
+          <h2 id="limites-t">Ce qui est vérifié, et ce qui ne l'est pas</h2>
+        </div>
+        <p class="body-p">
+          Testé réellement, sur Windows, Node 22 : création d'essaim, membres, posts, curseurs, prompt,
+          scope avec baseline, worktrees, verdicts, graphe mermaid, <code>doctor</code>, porte de
+          clôture. Un essaim réel de deux workers et un vérificateur a tourné en sous-agents OpenCode et
+          produit un tableau complet. 23 tests automatisés, chacun vérifié par mutation : inverser la
+          garde qu'il protège fait tomber exactement le test correspondant. CI sur Linux, macOS et
+          Windows, Node 18 à 22.
+        </p>
+        <p class="body-p">
+          La relecture qui a suivi le premier essai a trouvé quatre défauts réels, tous corrigés et
+          couverts : les rôles n'étaient pas appliqués, <code>@all</code> adressait les membres tués, un
+          nom de membre avec une espace cassait le graphe, et un <code>block</code> rendait la clôture
+          impossible pour toujours.
+        </p>
+      </div>
+
+      <aside class="limits" aria-label="Limites connues">
+        <p class="limits-t"><span aria-hidden="true">!</span> limites connues, écrites plutôt que cachées</p>
+        <ul>
+          <li>En arbre partagé, <code>mure scope</code> ne peut pas attribuer les fichiers entre deux workers concurrents — utilisez <code>--worktrees</code>, ou dispatchez un worker à la fois.</li>
+          <li><code>prompt</code> avance le curseur : un prompt perdu entre l'affichage et la livraison se récupère avec <code>mure cursor @x --reset</code>.</li>
+          <li>La fusion des branches <code>mure/&lt;slug&gt;/&lt;membre&gt;</code> est laissée au coordinateur, pas à l'outil.</li>
+          <li>Un tour perdu est indistinguable d'un tour jamais lancé.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="band band-close" aria-labelledby="suite-t">
+    <div class="wrap next">
+      <div>
+        <h2 id="suite-t">La suite est écrite</h2>
+        <p>
+          Le protocole normatif, les raisons de conception, les adaptateurs par harnais et quatre
+          transcriptions réelles d'essaims.
+        </p>
+      </div>
+      <ul class="next-links">
+        <li><a href="https://github.com/t12lve/mure/blob/main/docs/PROTOCOL.md">PROTOCOL — spécification normative</a></li>
+        <li><a href="https://github.com/t12lve/mure/blob/main/docs/DESIGN.md">DESIGN — pourquoi c'est construit ainsi</a></li>
+        <li><a href="https://github.com/t12lve/mure/blob/main/docs/ADAPTERS.md">ADAPTERS — lancer un membre par harnais</a></li>
+        <li><a href="https://github.com/t12lve/mure/blob/main/docs/EXAMPLES.md">EXAMPLES — quatre essaims complets</a></li>
+        <li><a href="https://github.com/t12lve/mure/blob/main/references/prompts.md">prompts — gabarits à copier</a></li>
+        <li><a href="https://github.com/t12lve/mure/blob/main/README.fr.md">README — la version française</a></li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-inner">
+    <p class="foot-brand"><span aria-hidden="true">群れ</span> mure</p>
+    <p class="foot-meta">
+      MIT · <a href="https://github.com/t12lve/mure">github.com/t12lve/mure</a> ·
+      <a href="https://github.com/t12lve/mure/issues">signaler un problème</a>
+    </p>
+    <p class="foot-note">
+      Page en français. La méthode et le protocole sont en anglais, portables d'un harnais à l'autre.
+    </p>
+    <p class="foot-prompt" aria-hidden="true">root@mure:~# <span class="foot-cursor">█</span></p>
+  </div>
+</footer>
+
+<script src="app.js" defer></script>
+</body>
+</html>

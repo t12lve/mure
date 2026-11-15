@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Mure">
+  <rect width="64" height="64" rx="6" fill="#040705"/>
+  <g fill="#39ff6a">
+    <circle cx="20" cy="22" r="3.2" opacity=".55"/>
+    <circle cx="32" cy="18" r="3.2" opacity=".75"/>
+    <circle cx="44" cy="22" r="3.2" opacity=".55"/>
+    <circle cx="26" cy="34" r="3.2" opacity=".7"/>
+    <circle cx="38" cy="34" r="3.2" opacity=".7"/>
+    <circle cx="32" cy="46" r="4.4"/>
+  </g>
+  <g stroke="#39ff6a" stroke-width="1.1" opacity=".35">
+    <path d="M20 22 32 18 44 22M26 34 32 18M38 34 32 18M26 34 32 46M38 34 32 46"/>
+  </g>
+</svg>

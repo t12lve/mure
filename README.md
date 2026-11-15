@@ -10,7 +10,7 @@ Mure is the `/swarm` idea from Google Antigravity, ported to harnesses whose age
 board — OpenCode, Claude Code, Codex CLI, Gemini CLI, Cursor. It is a **skill** (`SKILL.md`) plus a
 **dependency-free CLI** (`scripts/mure.mjs`).
 
-*[Français](README.fr.md)*
+*[Français](README.fr.md)* · [Site en français](https://t12lve.github.io/mure/)
 
 > The board is the only truth, a mention is the only wake signal, and the coordinator does not do the
 > technical work.
@@ -111,8 +111,9 @@ docs/
 scripts/mure.mjs       the CLI, zero dependencies, Node 18+
 test/mure.test.mjs     node --test, 23 tests
 references/prompts.md  paste-ready prompt templates
+site/                  the French landing page (GitHub Pages)
 install.ps1 / install.sh
-.github/workflows/     CI: Linux, macOS, Windows; Node 18 to 22
+.github/workflows/     CI: Linux, macOS, Windows; Node 18 to 22; Pages
 ```
 
 State lives in `.mure/<slug>/` at the project root: `board.jsonl` (append-only), `members.json`,
