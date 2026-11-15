@@ -53,6 +53,14 @@ foreach ($dir in $Targets) {
     }
   }
 
+  $dirFull = [IO.Path]::GetFullPath($dir)
+  $srcFull = [IO.Path]::GetFullPath($source)
+  if ($Copy -and $dirFull.StartsWith($srcFull + [IO.Path]::DirectorySeparatorChar)) {
+    Write-Host "skip  $dir (inside the source repository; choose a directory outside it)"
+    $skipped++
+    continue
+  }
+
   $dest = Join-Path $dir 'mure'
   if (Test-Path $dest) {
     $item = Get-Item $dest -Force

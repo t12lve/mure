@@ -64,6 +64,13 @@ for dir in "${targets[@]}"; do
     continue
   fi
   if [ "$copy" -eq 1 ]; then
+    dir_real="$(resolve "$dir")"
+    case "$dir_real/" in
+      "$src_real"/*)
+        echo "skip  $dir (inside the source repository; choose a directory outside it)"
+        skipped=$((skipped + 1))
+        continue ;;
+    esac
     cp -R "$src" "$dest"
     rm -rf "$dest/.git"
     echo "copy  $dest"

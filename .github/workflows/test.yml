@@ -40,9 +40,10 @@ jobs:
         shell: bash
         run: |
           bash -n install.sh
-          ./install.sh "$PWD/.test-skills"
-          test -f .test-skills/mure/SKILL.md
-          ./install.sh "$PWD/.test-skills"
-          ./install.sh --copy "$PWD/.test-copy"
-          test -f .test-copy/mure/SKILL.md
-          test ! -d .test-copy/mure/.git
+          ./install.sh "$RUNNER_TEMP/mure-skills"
+          test -f "$RUNNER_TEMP/mure-skills/mure/SKILL.md"
+          ./install.sh "$RUNNER_TEMP/mure-skills"
+          ./install.sh --copy "$RUNNER_TEMP/mure-copy"
+          test -f "$RUNNER_TEMP/mure-copy/mure/SKILL.md"
+          test ! -d "$RUNNER_TEMP/mure-copy/mure/.git"
+          ./install.sh --copy "$PWD/.inside" | grep -q "inside the source repository"
