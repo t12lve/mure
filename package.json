@@ -38,7 +38,7 @@
     "references/"
   ],
   "scripts": {
-    "test": "node --test test",
+    "test": "node --test test/mure.test.mjs",
     "help": "node scripts/mure.mjs help"
   },
   "engines": {

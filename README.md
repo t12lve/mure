@@ -135,7 +135,7 @@ State lives in `.mure/<slug>/` at the project root: `board.jsonl` (append-only),
 Tested for real on Windows with Node 22: swarm creation, members, posts, cursors, prompts, baseline
 scope, worktrees, verdicts, the mermaid graph, `doctor`, the close gate. A real swarm of two workers
 and one verifier ran as OpenCode subagents and produced a complete board. 23 automated tests
-(`node --test test`), each checked by mutation: invert the guard it protects and exactly that test goes
+(`npm test`), each checked by mutation: invert the guard it protects and exactly that test goes
 red. CI runs on Linux, macOS and Windows with Node 18 to 22.
 
 The review that followed the first live run found four real defects, all fixed and covered: roles were

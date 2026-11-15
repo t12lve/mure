@@ -133,7 +133,7 @@ commode, jamais obligatoire.
 Testé réellement, sur Windows, Node 22 : création d'essaim, membres, posts, curseurs, prompt, scope
 avec baseline, worktrees, verdicts, graphe mermaid, `doctor`, porte de clôture. Un essaim réel de deux
 workers et un vérificateur a tourné en subagents OpenCode et produit un tableau complet. 23 tests
-automatisés (`node --test test`), chacun vérifié par mutation : inverser la garde qu'il protège fait
+automatisés (`npm test`), chacun vérifié par mutation : inverser la garde qu'il protège fait
 tomber exactement le test correspondant. CI sur Linux, macOS et Windows, Node 18 à 22.
 
 La relecture qui a suivi le premier essai a trouvé quatre défauts réels, tous corrigés et couverts : les

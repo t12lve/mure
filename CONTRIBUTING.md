@@ -17,7 +17,7 @@ they keep it that way.
 ## Running the tests
 
 ```bash
-node --test test
+npm test
 ```
 
 Every test creates its own temporary repository; nothing touches your working tree. The `scope` test
@@ -25,7 +25,7 @@ is skipped when `git` is absent.
 
 ## Before you open a pull request
 
-- [ ] `node --test test` is green
+- [ ] `npm test` is green
 - [ ] New behaviour has a test, and you verified the test fails without the change (mutate the guard,
       watch it go red, restore)
 - [ ] `node scripts/mure.mjs doctor` still reports `board: clean` on a demo swarm
