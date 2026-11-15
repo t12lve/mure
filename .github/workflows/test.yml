@@ -1,0 +1,48 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / node ${{ matrix.node }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node: [22]
+        include:
+          - os: ubuntu-latest
+            node: 18
+          - os: ubuntu-latest
+            node: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Test
+        run: node --test test
+      - name: Smoke test the CLI
+        shell: bash
+        run: |
+          node scripts/mure.mjs help > /dev/null
+          node scripts/mure.mjs version
+      - name: Check the install script
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          bash -n install.sh
+          ./install.sh "$PWD/.test-skills"
+          test -f .test-skills/mure/SKILL.md
+          ./install.sh "$PWD/.test-skills"
+          ./install.sh --copy "$PWD/.test-copy"
+          test -f .test-copy/mure/SKILL.md
+          test ! -d .test-copy/mure/.git

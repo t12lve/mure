@@ -1,0 +1,47 @@
+{
+  "name": "mure",
+  "version": "0.1.0",
+  "description": "A shared board for a swarm of coding agents: coordinator, named workers, verifier, one append-only log.",
+  "type": "module",
+  "license": "MIT",
+  "author": "t12lve",
+  "keywords": [
+    "agents",
+    "multi-agent",
+    "orchestration",
+    "swarm",
+    "subagents",
+    "codex",
+    "claude-code",
+    "opencode",
+    "gemini-cli",
+    "skill"
+  ],
+  "homepage": "https://github.com/t12lve/mure#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/t12lve/mure.git"
+  },
+  "bugs": {
+    "url": "https://github.com/t12lve/mure/issues"
+  },
+  "bin": {
+    "mure": "scripts/mure.mjs"
+  },
+  "files": [
+    "SKILL.md",
+    "README.md",
+    "README.fr.md",
+    "CHANGELOG.md",
+    "scripts/",
+    "docs/",
+    "references/"
+  ],
+  "scripts": {
+    "test": "node --test test",
+    "help": "node scripts/mure.mjs help"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
