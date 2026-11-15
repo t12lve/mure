@@ -1,5 +1,7 @@
 # Mure 群れ
 
+[![test](https://github.com/t12lve/mure/actions/workflows/test.yml/badge.svg)](https://github.com/t12lve/mure/actions/workflows/test.yml)
+
 A flock of coding agents working on one blackboard: a coordinator splits the task, named workers build
 in parallel, an independent verifier runs the tests and judges, and nothing counts as done until that
 judge has spoken.
